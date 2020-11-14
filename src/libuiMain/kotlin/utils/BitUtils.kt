@@ -41,19 +41,7 @@ fun UInt.toHexString(size: UInt): String {
     return builder.reverse().toString()
 }
 
-fun UInt.toDecimalPart(size: UInt) {
-
-}
-
 fun UInt.roundToNibbles(): UInt {
-//    val rem = this and 0xfu
-//
-//    if(rem == 0u) {
-//        return this
-//    }
-//
-//    val nibbles = this shr 4
-//    return (nibbles + 1u) shl 4
     val rem = this and 0x3u
 
     if (rem == 0u) {
