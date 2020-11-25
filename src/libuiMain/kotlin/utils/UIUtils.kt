@@ -8,8 +8,7 @@ fun Container.numberInput() {
 }
 
 class NumberInput(
-        val value: TextField,
-        val
+        val value: TextField
 ) {
 
 }

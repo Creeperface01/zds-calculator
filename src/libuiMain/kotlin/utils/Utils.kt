@@ -7,6 +7,7 @@ import kotlinx.cinterop.cstr
 import number.BitNumber
 import number.FixedPoint
 import platform.posix.memcpy
+import platform.posix.pow
 import platform.windows.*
 
 const val INT_SIZE_BITS = 32u
@@ -69,6 +70,38 @@ fun String.toBigDecimalOrNull(): BigDecimal? {
     } catch (e: ArithmeticException) {
         null
     }
+}
+
+val hexMap = mapOf(
+        '0' to 0,
+        '1' to 1,
+        '2' to 2,
+        '3' to 3,
+        '4' to 4,
+        '5' to 5,
+        '6' to 6,
+        '7' to 7,
+        '8' to 8,
+        '9' to 9,
+        'a' to 10,
+        'b' to 11,
+        'c' to 12,
+        'd' to 13,
+        'e' to 14,
+        'f' to 15,
+)
+
+fun String.base2int(base: Int): Long {
+    require(base <= 16) {
+        "Only bases up to 16 are supported"
+    }
+
+    var r = 0L
+    this.toLowerCase().reversed().forEachIndexed { index, c ->
+        r += (pow(base.toDouble(), index.toDouble()).toLong() * (hexMap[c] ?: error("invalid base($base) string")))
+    }
+
+    return r
 }
 
 fun toClipboard(lastLine: String?) {
