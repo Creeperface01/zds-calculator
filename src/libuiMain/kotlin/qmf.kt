@@ -1,10 +1,9 @@
 import libui.ktx.appWindow
 import libui.ktx.page
 import libui.ktx.tabpane
-import page.adder
 import page.characters
-import page.negativeNumbers
 import page.qmf
+import page.systems
 
 fun main() = appWindow(
         title = "Qmf",
@@ -21,13 +20,17 @@ fun main() = appWindow(
             characters()
         }
 
-        page("Záporné čísla") {
-            negativeNumbers()
+        page("Číselné soustavy") {
+            systems()
         }
 
-        page("Binární sčítačka") {
-            adder()
-        }
+//        page("Záporné čísla") {
+//            negativeNumbers()
+//        }
+//
+//        page("Binární sčítačka") {
+//            adder()
+//        }
     }
 
 }

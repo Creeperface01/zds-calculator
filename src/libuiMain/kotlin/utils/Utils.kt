@@ -104,6 +104,40 @@ fun String.base2int(base: Int): Long {
     return r
 }
 
+val hex2Map = mapOf(
+        0L to '0',
+        1L to '1',
+        2L to '2',
+        3L to '3',
+        4L to '4',
+        5L to '5',
+        6L to '6',
+        7L to '7',
+        8L to '8',
+        9L to '9',
+        10L to 'a',
+        11L to 'b',
+        12L to 'c',
+        13L to 'd',
+        14L to 'e',
+        15L to 'f',
+)
+
+fun Long.toBase(base: Int): String {
+    require(base <= 16) {
+        "Only bases up to 16 are supported"
+    }
+    var t: Long = this
+
+    val str = StringBuilder()
+    while (t != 0L) {
+        str.append(hex2Map[t % base])
+        t /= base
+    }
+
+    return str.reverse().toString()
+}
+
 fun toClipboard(lastLine: String?) {
     val len = lastLine!!.length + 1
     val hMem = GlobalAlloc(GMEM_MOVEABLE, len.toULong())
