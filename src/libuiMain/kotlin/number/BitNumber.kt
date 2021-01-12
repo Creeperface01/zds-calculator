@@ -1,43 +1,41 @@
 package number
 
-import platform.posix.pow
-import utils.get
-import utils.to2Complement
-import utils.toBinaryString
-import utils.toHexString
+import com.ionspin.kotlin.bignum.integer.BigInteger
+import utils.*
 import kotlin.math.abs
 
 open class BitNumber : Comparable<BitNumber> {
 
-    val value: UInt
+    val value: ULong
     val size: UInt
-    val byteSize = 16u
+    val wordSize: UInt
+
     val signed: Boolean
 
-    val negative: Boolean
+    open val negative: Boolean
         get() = signed && value[size - 1u]
 
-    val signedValue: Int
-        get() = if (negative) from2Complement() else this.value.toInt()
+    open val signedValue: Long
+        get() = if (negative) from2Complement() else this.value.toLong()
 
-    constructor(value: UInt, size: UInt, signed: Boolean = false) {
+    constructor(value: ULong, size: UInt, wordSize: UInt = 16u, signed: Boolean = false) {
+        this.wordSize = wordSize
         this.size = size
-//        this.byteSize = size.roundToNibbles()
         this.value = trim(value)
         this.signed = signed
     }
 
-    constructor(value: Int, size: UInt) {
+    constructor(value: Long, size: UInt, wordSize: UInt = 16u) {
         this.size = size
-//        this.byteSize = size.roundToNibbles()
+        this.wordSize = wordSize
         this.signed = value < 0
 
         this.value = trim(
-                if (signed) {
-                    abs(value).toUInt().to2Complement()
-                } else {
-                    value.toUInt()
-                }
+            if (signed) {
+                abs(value).toULong().to2Complement()
+            } else {
+                value.toULong()
+            }
         )
     }
 
@@ -53,12 +51,12 @@ open class BitNumber : Comparable<BitNumber> {
         return BitNumber(this.signedValue - n.signedValue, size)
     }
 
-    private fun trim(value: UInt) = value and ((pow(2.0, byteSize.toDouble()) - 1).toUInt())
+    private fun trim(value: ULong) = value and (pow2big(wordSize) - BigInteger.ONE).ulongValue()
 
     fun inv() = this.value.inv()
 
-    fun from2Complement(): Int {
-        return -trim((this.value - 1u).inv()).toInt()
+    fun from2Complement(): Long {
+        return -trim((this.value - 1uL).inv()).toLong()
     }
 
     override fun compareTo(other: BitNumber): Int {
@@ -69,7 +67,7 @@ open class BitNumber : Comparable<BitNumber> {
         return "BitNumber(bits=${this.toBinaryString()}, signed=$signedValue, size=$size)"
     }
 
-    fun toBinaryString() = this.value.toBinaryString(this.byteSize)
+    fun toBinaryString() = this.value.toBinaryString(this.wordSize)
 
-    fun toHexString() = this.value.toHexString(this.byteSize)
+    fun toHexString() = this.value.toHexString(this.wordSize)
 }

@@ -1,7 +1,7 @@
 package page
 
 import libui.ktx.*
-import utils.base2int
+import utils.base2uint
 import utils.toHexString
 
 fun TabPane.Page.characters() = vbox {
@@ -50,33 +50,35 @@ fun TabPane.Page.characters() = vbox {
                 value = value.substring(2)
             }
 
-            val unicodeNumber = value.base2int(16)
-            val pos = (unicodeNumber shr 0xf) and 0xff
+            val unicodeNumber = value.base2uint(16u)
+            val pos = (unicodeNumber shr 0xf) and 0xffu
 
             fun utf32() {
                 hexUTF32.value = "0x" + unicodeNumber.toUInt().toHexString(32u)
             }
 
             fun utf16() {
-                if (unicodeNumber <= 0xffff) {
+                if (unicodeNumber <= 0xffffu) {
                     hexUTF16.value = "0x" + unicodeNumber.toUInt().toHexString(16u)
                     return
                 }
 
-                val data = unicodeNumber - 0x01_0000
+                val data = unicodeNumber - 0x01_0000u
 
-                val lead = ((data shr 10) and 0b11_1111_1111) + 0xD800
-                val trail = (data and 0b11_1111_1111) + 0xDC00
+                val lead = ((data shr 10) and 0b11_1111_1111u) + 0xD800u
+                val trail = (data and 0b11_1111_1111u) + 0xDC00u
 
-                hexUTF16.value = "0x${(lead and 0xffff).toUInt().toHexString(16u)} 0x${(trail and 0xffff).toUInt().toHexString(16u)}"
+                hexUTF16.value = "0x${(lead and 0xffffu).toUInt().toHexString(16u)} 0x${
+                    (trail and 0xffffu).toUInt().toHexString(16u)
+                }"
             }
 
             fun utf8() {
                 val parts = IntArray(4) {
-                    ((unicodeNumber shr (it * 6)) and 0b11_1111).toInt()
+                    ((unicodeNumber shr (it * 6)) and 0b11_1111u).toInt()
                 }
 
-                var zeroByte = 3
+                var zeroByte = 4
                 for (i in parts.indices) {
                     if (parts[i] == 0) {
                         zeroByte = i
@@ -89,13 +91,13 @@ fun TabPane.Page.characters() = vbox {
                 }
 
                 val prefix = when (zeroByte) {
-                    0 -> 0b0000_0000
-                    1 -> 0b1100_0000
-                    2 -> 0b1110_0000
+                    1 -> 0b0000_0000
+                    2 -> 0b1100_0000
+                    3 -> 0b1110_0000
                     else -> 0b1111_0000
                 }
 
-                parts[zeroByte] = parts[zeroByte] or prefix
+                parts[zeroByte - 1] = parts[zeroByte - 1] or prefix
 
                 hexUTF8.value = parts.reversed().joinToString(" ") {
                     "0x" + it.toUInt().toHexString(8u)
@@ -114,9 +116,9 @@ fun TabPane.Page.characters() = vbox {
                 return
             }
 
-            val number = input.base2int(16)
+            val number = input.base2uint(16u)
             val bytes = IntArray(4) {
-                ((number shr (it * 8)) and 0xff).toInt()
+                ((number shr (it * 8)) and 0xffu).toInt()
             }
 
             var leadIndex = 3
@@ -157,22 +159,22 @@ fun TabPane.Page.characters() = vbox {
                 return
             }
 
-            val number = input.base2int(16)
-            if (number <= 0xFFFF) {
+            val number = input.base2uint(16u)
+            if (number <= 0xFFFFu) {
                 unicode.value = "U+" + number.toUInt().toHexString(16u)
                 return
             }
 
-            var lead = (number shr 16) and 0xffff
-            var trail = number and 0xffff
+            var lead = (number shr 16) and 0xffffu
+            var trail = number and 0xffffu
 
-            lead -= 0xD800
-            trail -= 0xDC00
+            lead -= 0xD800u
+            trail -= 0xDC00u
 
-            lead = lead and 0b11_1111_1111
-            trail = trail and 0b11_1111_1111
+            lead = lead and 0b11_1111_1111u
+            trail = trail and 0b11_1111_1111u
 
-            val result = (trail or (lead shl 10)) + 0x01_0000
+            val result = (trail or (lead shl 10)) + 0x01_0000u
 
             unicode.value = "U+" + result.toUInt().toHexString(24u)
         }
@@ -184,7 +186,7 @@ fun TabPane.Page.characters() = vbox {
                 return
             }
 
-            val number = input.base2int(16)
+            val number = input.base2uint(16u)
             unicode.value = "U+" + number.toUInt().toHexString(24u)
         }
 
